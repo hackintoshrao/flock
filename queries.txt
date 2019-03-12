@@ -1,0 +1,13 @@
+This file contains queries that should be answerable by the database. More
+queries should be added.
+
+
+* Who are the top 10 tweeters?
+
+* Who are the top 10 followed?
+
+* What the the most recent 100 tweets?
+
+* What is Taylor Swift's tweet stream.
+
+* Who is the most connected? (Defined here as the user with the most followers plus followers of followers.)

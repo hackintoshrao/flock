@@ -1,0 +1,9 @@
+author: uid .
+description: string @index(fulltext) .
+friends_count: int @index(int) .
+id_str: string @index(exact) .
+mention: [uid] .
+retweet: bool @index(bool) .
+screen_name: string @index(exact) .
+user_id: string @index(exact) .
+verified: bool @index(bool) .
