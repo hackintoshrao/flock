@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"strconv"
 	"strings"
 	"sync"
@@ -126,6 +127,7 @@ func main() {
 	}
 	stream, err := client.Streams.Filter(params)
 	CheckFatal(err, "Unable to get twitter stream")
+	go stopOnSignal(stream)
 
 	log.Printf("Using %v dgraph clients on %v alphas\n",
 		opts.NumDgrClients, len(opts.AlphaSockAddr))
@@ -460,4 +462,12 @@ func newApiClients(sockAddr []string) []api.DgraphClient {
 
 func unquote(s string) string {
 	return s[1 : len(s)-1]
+}
+
+func stopOnSignal(stream *twitter.Stream) {
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, os.Interrupt, os.Kill)
+	sig := <-ch
+	fmt.Println("Received signal: ", sig)
+	stream.Stop()
 }
