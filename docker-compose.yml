@@ -1,7 +1,20 @@
 # Auto-generated with: [/home/javier/dgraph-io/dgraph/compose/compose -u -d /var/data/twitterer]
+# Plus manual edits.
 #
 version: "3.5"
 services:
+  add_schema:
+    image: dgraph/dgraph:latest
+    container_name: add_schema
+    depends_on:
+    - alpha1
+    volumes:
+    - type: bind
+      source: ./tweets.schema
+      target: /data/tweets.schema
+      read_only: true
+    user: ${UID:-1000}
+    command: curl alpha1:8180/alter -XPOST -d@/data/tweets.schema
   alpha1:
     image: dgraph/dgraph:latest
     container_name: alpha1
