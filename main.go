@@ -104,6 +104,7 @@ type twitterTweet struct {
 var (
 	opts  Options
 	stats Stats
+	once  sync.Once
 )
 
 func main() {
@@ -138,6 +139,7 @@ func main() {
 	}
 	go reportStats()
 	wg.Wait()
+	log.Printf("Exiting")
 }
 
 func CheckFatal(err error, format string, args ...interface{}) {
@@ -152,14 +154,7 @@ func runInserter(alphas []api.DgraphClient, wg *sync.WaitGroup, tweets <-chan in
 	defer wg.Done()
 
 	dgr := dgo.NewDgraphClient(alphas...)
-
-	// create index on id strings
-	op := &api.Operation{
-		Schema: `user_id: string @index(exact) .
-id_str: string @index(exact) .`,
-	}
-	err := dgr.Alter(context.Background(), op)
-	CheckFatal(err, "error in creating indexes")
+	once.Do(func() { addSchema(dgr) })
 
 	for jsn := range tweets {
 		atomic.AddUint32(&stats.Tweets, 1)
@@ -468,6 +463,15 @@ func stopOnSignal(stream *twitter.Stream) {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, os.Interrupt, os.Kill)
 	sig := <-ch
-	fmt.Println("Received signal: ", sig)
+	log.Printf("Stopping twitter stream. Received signal: %v", sig)
 	stream.Stop()
+}
+
+func addSchema(dgr *dgo.Dgraph) {
+	schemaFile := "tweets.schema"
+	schema, err := ioutil.ReadFile(schemaFile)
+	CheckFatal(err, "Unable to read schema file '%s'", schemaFile)
+
+	err = dgr.Alter(context.Background(), &api.Operation{Schema: string(schema)})
+	CheckFatal(err, "Error setting schema")
 }
