@@ -6,8 +6,12 @@ queries should be added.
 
 * Who are the top 10 followed?
 
-* What the the most recent 100 tweets?
+* What the the most recent tweets?
 
-* What is Taylor Swift's tweet stream.
+* What is Taylor Swift's tweet stream?
 
-* Who is the most connected? (Defined here as the user with the most followers plus followers of followers.)
+* Who are the top potential influencers? (The users with the most followers +
+  followers of followers (+ followers of followers of followers + ...).
+
+* What are the most controversial tweets? (The tweets with the highest
+  responses to likes+retweets ratio.)
